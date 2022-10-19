@@ -95,7 +95,7 @@ class ReflexAgent(Agent):
                 minDistFantasma = manhattanDistance(ghost.getPosition(), newPos)  # quedarse con la distancia minima a un fantasma
 
         # primero hago el inverso porque quiero que cuanto mas grande la distancia mejor sea el resultado.
-        # multiplico por 100 para darle algo mas de peso a la distancia respecto al fantasma
+        # multiplico por 100 para darle algo mas de peso a la distancia respecto al fantasma en relacion a la distancia con la comida
         minDistFanstasmaEscalada = 100*4**-minDistFantasma
 
         return -(minDistComida+minDistFanstasmaEscalada)
