@@ -90,10 +90,9 @@ class ReflexAgent(Agent):
         else:
             minDistComida = 0
 
-        distFantasmas = 0
         for ghost in newGhostStates:  # the impact of ghost surges as distance get close
             if manhattanDistance(ghost.getPosition(), newPos) < minDistFantasma:
-                minDistFantasma = manhattanDistance(ghost.getPosition(), newPos)  # quedarse con la distancia minima a una comida
+                minDistFantasma = manhattanDistance(ghost.getPosition(), newPos)  # quedarse con la distancia minima a un fantasma
 
         # primero hago el inverso porque quiero que cuanto mas grande la distancia mejor sea el resultado.
         # multiplico por 100 para darle algo mas de peso a la distancia respecto al fantasma
