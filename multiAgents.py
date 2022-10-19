@@ -10,7 +10,7 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
+import sys
 
 from util import manhattanDistance
 from game import Directions
@@ -76,19 +76,30 @@ class ReflexAgent(Agent):
         newGhostStates = successorgameState.getGhostStates() # posicion de los fantamas
         newListFood = newFood.asList()  # coord de comidas DESPUES de la accion
         newFoodNum = len(newListFood)
+        minDistComida = sys.maxsize
+        minDistFantasma = sys.maxsize
 
+        # cuanto menor el score --> mayor prirodiad del estado (pensar en cola proritaria)
+        # cuanto menor distancia a la comida mas cercana --> MEJOR
+        # cuanto mayor distancia al fantasma mas cercano --> MEJOR
 
         if newFoodNum == oldFoodNum:  # si la accion no come punto
-            score = 10**1000  # numero muy grande
             for food in newListFood:
-                if manhattanDistance(food, newPos) < score:
-                    score = manhattanDistance(food, newPos)  # quedarse con la distancia minima a una comida
+                if manhattanDistance(food, newPos) < minDistComida:
+                    minDistComida = manhattanDistance(food, newPos)  # quedarse con la distancia minima a una comida
         else:
-            score = 0
+            minDistComida = 0
 
+        distFantasmas = 0
         for ghost in newGhostStates:  # the impact of ghost surges as distance get close
-            score += + 4 ** (2 - manhattanDistance(ghost.getPosition(), newPos))
-        return -score
+            if manhattanDistance(ghost.getPosition(), newPos) < minDistFantasma:
+                minDistFantasma = manhattanDistance(ghost.getPosition(), newPos)  # quedarse con la distancia minima a una comida
+
+        # primero hago el inverso porque quiero que cuanto mas grande la distancia mejor sea el resultado.
+        # multiplico por 100 para darle algo mas de peso a la distancia respecto al fantasma
+        minDistFanstasmaEscalada = 100*4**-minDistFantasma
+
+        return -(minDistComida+minDistFanstasmaEscalada)
 
 def scoreEvaluationFunction(currentGameState):
     """
