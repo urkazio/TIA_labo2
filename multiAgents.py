@@ -246,7 +246,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             utility = self.minValue(0, 1, successor, alfa, beta)  # empezar el algoritmo con el primer fantasma
             if utility > maxScore:
                 maxScore = utility
-                bestAction = action  # guardar la accion cuya utility es la mayor hasta la fecha
+                bestAction = action  # guardar la accion cuya utility es la mayor hasta la fecha,
 
         return bestAction
 
