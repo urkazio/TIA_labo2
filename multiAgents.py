@@ -207,21 +207,26 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # --- parte no recursiva ---
         if depth == self.depth:  # comprobar que si se ha llegado al depth arbitrario
             return self.evaluationFunction(state)
+
         else:
             # se deben obtener los estados sucesores a partir de las acciones legales:
             actions = state.getLegalActions(agentid)
+
             if len(actions) == 0:  # si el nodo es hoja
                 return self.evaluationFunction(state)
 
             # --- parte recursiva ---
             for action in actions:
+
                 if agentid == state.getNumAgents()-1:  # si ya se han recorrido todos los fantasmas del turno...
                     # --> le vuelve a tocar al pacman y se avanza una profundidad
                     successor = state.generateSuccessor(agentid, action)
                     v = min(v, self.maxValue(depth+1, 0, successor))
+
                 else:  # si el siguiente turno es de otro fantasma...
                     successor = state.generateSuccessor(agentid, action)
                     v = min(v, self.minValue(depth, agentid+1, successor))
+
             return v
 
 
@@ -257,6 +262,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         # --- parte no recursiva ---
         if depth == self.depth:  # comprobar que si se ha llegado al depth arbitrario
             return self.evaluationFunction(state)
+
         else:
             # se deben obtener los estados sucesores a partir de las acciones legales:
             actions = state.getLegalActions(agentid)
@@ -267,9 +273,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             for action in actions:
                 successor = state.generateSuccessor(agentid, action)
                 v = max(v, self.minValue(depth, agentid + 1, successor, alfa, beta))
+
                 if v >= beta:
                     return v
                 alfa = max(alfa, v)
+
             return v
 
     def minValue(self, depth, agentid, state, alfa, beta):
@@ -287,19 +295,24 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
             # --- parte recursiva ---
             for action in actions:
+
                 if agentid == state.getNumAgents() - 1:  # si ya se han recorrido todos los fantasmas del turno...
                     # --> le vuelve a tocar al pacman y se avanza una profundidad
                     successor = state.generateSuccessor(agentid, action)
                     v = min(v, self.maxValue(depth + 1, 0, successor, alfa, beta))
+
                     if v <= alfa:
                         return v
                     beta = min(beta, v)
+
                 else:  # si el siguiente turno es de otro fantasma...
                     successor = state.generateSuccessor(agentid, action)
                     v = min(v, self.minValue(depth, agentid + 1, successor, alfa, beta))
+
                     if v <= alfa:
                         return v
                     beta = min(beta, v)
+
             return v
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
