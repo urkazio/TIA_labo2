@@ -158,8 +158,72 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # ---------------------- COSAS A TENER EN CUENTA ---------------------
+        # hacer el arbol de profundidad depth
+        # evaluar las hojas con scoreEvaluationFunction
+        # el pacman es el agente 0, el resto se supone que son fantasmas
+        # PUEDE HABER VARIOS FANTASMAS !!!!
+        # Una capa de profundidad implica el movimiento del pacman y de todos los fantasmas
+        # ---------------------------------------------------------------------
+
+        maxScore = -sys.maxsize  #-inf
+        bestAction = "Stop"  # empezar MANUALMENTE con el pacman haciendo algun movimiento (el de menor riesgo es estar parado)
+        actions = gameState.getLegalActions(0) # se empieza con el pacman
+
+        for action in actions:
+            successor = gameState.generateSuccessor(0, action)  # se arranca el algoritmo con el primer fantasma (el primer movimiento ha sido manual)
+            aux = self.minValue(0, 1, successor)  # empezar el algoritmo con el primer fantasma
+            if aux > maxScore:
+                maxScore = aux
+                bestAction = action  # guardar la accion cuya utility es la mayor hasta la fecha
+
+        return bestAction
+
+
+    def maxValue(self, depth, agentid, state):
+
+        v = -sys.maxsize #-inf
+
+        # --- parte no recursiva ---
+        if depth == self.depth:  # comprobar que si se ha llegado al depth arbitrario
+            return self.evaluationFunction(state)
+        else:
+            # se deben obtener los estados sucesores a partir de las acciones legales:
+            actions = state.getLegalActions(agentid)
+            if len(actions) == 0:  # si el nodo es hoja
+                return self.evaluationFunction(state)
+
+            # --- parte recursiva ---
+            for action in actions:
+                successor = state.generateSuccessor(agentid, action)
+                v = max(v, self.minValue(depth, agentid+1, successor))
+            return v
+
+
+    def minValue(self, depth, agentid, state):
+
+        v = sys.maxsize #inf
+
+        # --- parte no recursiva ---
+        if depth == self.depth:  # comprobar que si se ha llegado al depth arbitrario
+            return self.evaluationFunction(state)
+        else:
+            # se deben obtener los estados sucesores a partir de las acciones legales:
+            actions = state.getLegalActions(agentid)
+            if len(actions) == 0:  # si el nodo es hoja
+                return self.evaluationFunction(state)
+
+            # --- parte recursiva ---
+            for action in actions:
+                if agentid == state.getNumAgents()-1:  # si ya se han recorrido todos los fantasmas del turno...
+                    # --> le vuelve a tocar al pacman y se avanza una profundidad
+                    successor = state.generateSuccessor(agentid, action)
+                    v = min(v, self.maxValue(depth+1, 0, successor))
+                else:  # si el siguiente turno es de otro fantasma...
+                    successor = state.generateSuccessor(agentid, action)
+                    v = min(v, self.minValue(depth, agentid+1, successor))
+            return v
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
