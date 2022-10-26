@@ -337,7 +337,75 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        maxScore = -sys.maxsize  # -inf
+        bestAction = "Stop"  # empezar MANUALMENTE con el pacman haciendo algun movimiento (el de menor riesgo es estar parado)
+        actions = gameState.getLegalActions(0)  # se empieza con el pacman
+
+        for action in actions:
+            successor = gameState.generateSuccessor(0,
+                                                    action)  # se arranca el algoritmo con el primer fantasma (el primer movimiento ha sido manual)
+            utility = self.expValue(0, 1, successor)  # empezar el algoritmo con el primer fantasma
+            if utility > maxScore:
+                maxScore = utility
+                bestAction = action  # guardar la accion cuya utility es la mayor hasta la fecha
+
+        return bestAction
+
+    def maxValue(self, depth, agentid, state):
+
+        v = -sys.maxsize  # -inf
+
+        # --- parte no recursiva ---
+        if depth == self.depth:  # comprobar que si se ha llegado al depth arbitrario
+            return self.evaluationFunction(state)
+        else:
+            # se deben obtener los estados sucesores a partir de las acciones legales:
+            actions = state.getLegalActions(agentid)
+            if len(actions) == 0:  # si el nodo es hoja
+                return self.evaluationFunction(state)
+
+            # --- parte recursiva ---
+            for action in actions:
+                successor = state.generateSuccessor(agentid, action)
+                v = max(v, self.expValue(depth, agentid + 1, successor))
+            return v
+    def expValue(self, depth, agentid, state):
+        v = sys.maxsize #inf
+
+        # --- parte no recursiva ---
+        if depth == self.depth:  # comprobar que si se ha llegado al depth arbitrario
+            return self.evaluationFunction(state)
+
+        else:
+            # se deben obtener los estados sucesores a partir de las acciones legales:
+            actions = state.getLegalActions(agentid)
+
+            if len(actions) == 0:  # si el nodo es hoja
+                return self.evaluationFunction(state)
+
+            successors = []
+
+            for action in actions:
+                successors.append(state.generateSuccessor(agentid, action))
+
+            costAcum = []
+
+            # --- parte recursiva ---
+            for successor in successors:
+
+                if agentid == state.getNumAgents()-1:  # si ya se han recorrido todos los fantasmas del turno...
+                    # --> le vuelve a tocar al pacman y se avanza una profundidad
+                    costAcum.append(self.maxValue(depth+1, 0, successor))
+
+                else:  # si el siguiente turno es de otro fantasma...
+                    costAcum.append(self.expValue(depth, agentid+1, successor))
+
+            sum(costAcum)
+
+            avgCost = (sum(costAcum) / len(costAcum))
+
+            return avgCost
+
 
 def betterEvaluationFunction(currentGameState):
     """
@@ -347,7 +415,9 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    return currentGameState.getScore()
+
 
 # Abbreviation
 better = betterEvaluationFunction
