@@ -240,58 +240,55 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        maxScore = -sys.maxsize  # -inf
-        alfa = -sys.maxsize  # -inf
-        beta = sys.maxsize  # inf
-        bestAction = "Stop"  # empezar MANUALMENTE con el pacman haciendo algun movimiento (el de menor riesgo es estar parado)
-        actions = gameState.getLegalActions(0)  # se empieza con el pacman
 
-        for action in actions:
-            successor = gameState.generateSuccessor(0, action)  # se arranca el algoritmo con el primer fantasma (el primer movimiento ha sido manual)
-            utility = self.minValue(0, 1, successor, alfa, beta)  # empezar el algoritmo con el primer fantasma
-            if utility > maxScore:
-                maxScore = utility
-                bestAction = action  # guardar la accion cuya utility es la mayor hasta la fecha,
-
+        bestAction = self.maxValue(0, 0, gameState, -sys.maxsize, sys.maxsize)[1]
         return bestAction
 
     def maxValue(self, depth, agentid, state, alfa, beta):
 
         v = -sys.maxsize  # -inf
+        bestAction = "Stop"
 
         # --- parte no recursiva ---
         if depth == self.depth:  # comprobar que si se ha llegado al depth arbitrario
-            return self.evaluationFunction(state)
+            return [self.evaluationFunction(state), bestAction]
 
         else:
             # se deben obtener los estados sucesores a partir de las acciones legales:
             actions = state.getLegalActions(agentid)
             if len(actions) == 0:  # si el nodo es hoja
-                return self.evaluationFunction(state)
+                return [self.evaluationFunction(state), bestAction]
 
             # --- parte recursiva ---
             for action in actions:
                 successor = state.generateSuccessor(agentid, action)
-                v = max(v, self.minValue(depth, agentid + 1, successor, alfa, beta))
+
+                coste = max(v, self.minValue(depth, agentid + 1, successor, alfa, beta)[0])
+
+                if coste > v:
+                    v = coste
+                    bestAction = action
 
                 if v > beta:
-                    return v
+                    return [v, bestAction]
+
                 alfa = max(alfa, v)
 
-            return v
+            return [v, bestAction]
 
     def minValue(self, depth, agentid, state, alfa, beta):
 
         v = sys.maxsize  # inf
+        bestAction = "Stop"
 
         # --- parte no recursiva ---
         if depth == self.depth:  # comprobar que si se ha llegado al depth arbitrario
-            return self.evaluationFunction(state)
+            return [self.evaluationFunction(state), bestAction]
         else:
             # se deben obtener los estados sucesores a partir de las acciones legales:
             actions = state.getLegalActions(agentid)
             if len(actions) == 0:  # si el nodo es hoja
-                return self.evaluationFunction(state)
+                return [self.evaluationFunction(state), bestAction]
 
             # --- parte recursiva ---
             for action in actions:
@@ -299,21 +296,33 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 if agentid == state.getNumAgents() - 1:  # si ya se han recorrido todos los fantasmas del turno...
                     # --> le vuelve a tocar al pacman y se avanza una profundidad
                     successor = state.generateSuccessor(agentid, action)
-                    v = min(v, self.maxValue(depth + 1, 0, successor, alfa, beta))
+
+                    coste = min(v, self.maxValue(depth + 1, 0, successor, alfa, beta)[0])
+
+                    if coste < v:
+                        v = coste
+                        bestAction = action
 
                     if v < alfa:
-                        return v
+                        return [v, bestAction]
+
                     beta = min(beta, v)
 
                 else:  # si el siguiente turno es de otro fantasma...
                     successor = state.generateSuccessor(agentid, action)
-                    v = min(v, self.minValue(depth, agentid + 1, successor, alfa, beta))
+
+                    coste = min(v, self.minValue(depth, agentid + 1, successor, alfa, beta)[0])
+
+                    if coste < v:
+                        v = coste
+                        bestAction = action
 
                     if v < alfa:
-                        return v
+                        return [v, bestAction]
+
                     beta = min(beta, v)
 
-            return v
+            return [v, bestAction]
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
