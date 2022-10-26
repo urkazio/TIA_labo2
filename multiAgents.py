@@ -167,11 +167,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # ---------------------------------------------------------------------
 
         maxScore = -sys.maxsize  #-inf
-        bestAction = "Stop"  # empezar MANUALMENTE con el pacman haciendo algun movimiento (el de menor riesgo es estar parado)
-        actions = gameState.getLegalActions(0) # se empieza con el pacman
+        actions = gameState.getLegalActions(0)  # obtener acciones del pacman
 
         for action in actions:
-            successor = gameState.generateSuccessor(0, action)  # se arranca el algoritmo con el primer fantasma (el primer movimiento ha sido manual)
+            successor = gameState.generateSuccessor(0, action)  # sucesores de root
             utility = self.minValue(0, 1, successor)  # empezar el algoritmo con el primer fantasma
             if utility > maxScore:
                 maxScore = utility
