@@ -368,6 +368,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                 successor = state.generateSuccessor(agentid, action)
                 v = max(v, self.expValue(depth, agentid + 1, successor))
             return v
+
     def expValue(self, depth, agentid, state):
         v = sys.maxsize #inf
 
@@ -415,7 +416,29 @@ def betterEvaluationFunction(currentGameState):
     """
     "*** YOUR CODE HERE ***"
 
-    return currentGameState.getScore()
+
+
+    """ --- DATOS DESPUES DE EJECUTAR LA ACCION --- """
+    newPos = currentGameState.getPacmanPosition()  # coordenada tras la accion
+    newFood = currentGameState.getFood()  # matriz bool con comidas
+    newGhostStates = currentGameState.getGhostStates()  # posicion de los fantamas
+    newListFood = newFood.asList()  # coord de comidas DESPUES de la accion
+
+    # cuanto MENOR distancia a las comidas --> MEJOR
+    # cuanto MAYOR distancia al fantasma mas cercano --> MEJOR
+
+    scoreComida = 0
+    for food in newListFood:
+        scoreComida += manhattanDistance(food, newPos)
+
+    minDistFantasma = sys.maxsize
+    for ghost in newGhostStates:  # the impact of ghost surges as distance get close
+        if manhattanDistance(ghost.getPosition(), newPos) < minDistFantasma:
+            minDistFantasma = manhattanDistance(ghost.getPosition(), newPos)  # quedarse con la distancia minima a un fantasma
+
+    minDistFanstasmaEscalada = 2 ** -minDistFantasma
+
+    return 2*currentGameState.getScore() - (scoreComida+minDistFanstasmaEscalada)
 
 
 # Abbreviation
