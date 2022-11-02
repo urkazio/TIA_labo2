@@ -337,8 +337,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         maxScore = -sys.maxsize  # -inf
-        bestAction = "Stop"  # empezar MANUALMENTE con el pacman haciendo algun movimiento (el de menor riesgo es estar parado)
-        actions = gameState.getLegalActions(0)  # se empieza con el pacman
+        actions = gameState.getLegalActions(0)
 
         for action in actions:
             successor = gameState.generateSuccessor(0,
